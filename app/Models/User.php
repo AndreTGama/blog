@@ -3,6 +3,8 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
+use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
@@ -22,6 +24,7 @@ class User extends Authenticatable
         'email',
         'password',
         'photo_name',
+        'type_user_id',
     ];
 
     /**
@@ -44,4 +47,29 @@ class User extends Authenticatable
         'email_verified_at' => 'datetime',
         'password' => 'hashed',
     ];
+    /**
+     * Set the name user UpperCase.
+     */
+    protected function name(): Attribute
+    {
+        return Attribute::make(
+            // TODO In that case, just so you don't forget
+            // get: function ($value) {
+            //     if (strpos($value, 'https://') !== FALSE || strpos($value, 'http://') !== FALSE) {
+            //         return $value;
+            //     }
+            //     return asset('storage/' . $value);
+            // },
+            set: fn (string $value) => ucwords($value),
+        );
+    }
+    /**
+     * Set the users password.
+     */
+    protected function password(): Attribute
+    {
+        return Attribute::make(
+            set: fn (string $value) => bcrypt($value),
+        );
+    }
 }
