@@ -2,8 +2,6 @@
 
 namespace App\Models;
 
-// use Illuminate\Contracts\Auth\MustVerifyEmail;
-
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Foundation\Auth\User as Authenticatable;
@@ -53,13 +51,6 @@ class User extends Authenticatable
     protected function name(): Attribute
     {
         return Attribute::make(
-            // TODO In that case, just so you don't forget
-            // get: function ($value) {
-            //     if (strpos($value, 'https://') !== FALSE || strpos($value, 'http://') !== FALSE) {
-            //         return $value;
-            //     }
-            //     return asset('storage/' . $value);
-            // },
             set: fn (string $value) => ucwords($value),
         );
     }
