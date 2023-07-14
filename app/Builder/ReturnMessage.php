@@ -15,7 +15,7 @@ class ReturnMessage
 	 * @param  mixed $exception
 	 * @param  mixed $data
      * @param  int $status
-	 * @return void
+	 * @return JsonResponse
 	 */
 	public static function message(
         bool $error,

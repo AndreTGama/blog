@@ -4,7 +4,7 @@ namespace App\Rules\Users;
 
 use Illuminate\Contracts\Validation\Rule;
 
-class FullName implements Rule
+class FullName
 {
     /**
      * Create a new rule instance.
