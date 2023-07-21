@@ -68,4 +68,4 @@ Run command in terminal
     php artisan serve
 ```
 
-Use the routes that are in this link to see the api in action: [LINK UNDER CONSTRUCTION]
+Use the routes that are in this link to see the api in action: https://github.com/AndreTGama/blog_insomnia
