@@ -9,6 +9,7 @@ Route::group([
     'controller' => CategoriesController::class,
     'prefix' => 'categories',
     'as' => 'categories.',
+    'middleware' => 'auth.jwt',
 ], function () {
     Route::get('/{id}', 'get')->name('get');
     Route::get('/', 'index')->name('index');
