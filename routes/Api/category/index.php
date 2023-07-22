@@ -16,4 +16,5 @@ Route::group([
     Route::post('/', 'store')->name('store');
     Route::put('/{id}', 'update')->name('update');
     Route::delete('/{id}', 'delete')->name('delete');
+    Route::put('/restore/{id}', 'restore')->name('restore');
 });

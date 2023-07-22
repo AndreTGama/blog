@@ -100,6 +100,13 @@ class CategoriesController extends Controller
             );
         }
     }
+    /**
+     * update
+     *
+     * @param  StoreCategoriesRequest $req
+     * @param  int $id
+     * @return JsonResponse
+     */
     public function update(StoreCategoriesRequest $req, int $id): JsonResponse
     {
         DB::beginTransaction();
@@ -152,6 +159,40 @@ class CategoriesController extends Controller
                 "Category remove with sucsess",
                 null,
                 [],
+                200
+            );
+
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ReturnMessage::message(
+                true,
+                $e->getMessage(),
+                $e->getMessage(),
+                null,
+                [],
+                400
+            );
+        }
+    }
+    /**
+     * restore
+     *
+     * @param  mixed $id
+     * @return JsonResponse
+     */
+    public function restore(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $category = Categories::withTrashed()->findOrFail($id)->restore();
+
+            DB::commit();
+            return ReturnMessage::message(
+                false,
+                "Category restored with sucsess",
+                "Category restored with sucsess",
+                null,
+                $category,
                 200
             );
 
