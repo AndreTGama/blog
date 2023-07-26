@@ -18,7 +18,7 @@ return new class extends Migration
             $table->boolean('aprove')->default(0);
             $table->unsignedBigInteger('author_id');
             $table->foreign('author_id')->references('id')->on('users');
-            $table->unsignedBigInteger('moderator_id');
+            $table->unsignedBigInteger('moderator_id')->nullable();
             $table->foreign('moderator_id')->references('id')->on('users');
             $table->softDeletes();
             $table->timestamps();
