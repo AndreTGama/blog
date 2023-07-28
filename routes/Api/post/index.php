@@ -17,11 +17,12 @@ Route::group([
     Route::group(['middleware' => 'auth.jwt'], function () {
 
         Route::post('/', 'store')->name('create');
-        Route::put('/{id}', 'update')->name('update');
         Route::delete('/{id}', 'delete')->name('delete');
+        Route::put('/{id}', 'restore')->name('restore');
 
         Route::group(['prefix' => 'my-posts'], function () {
             Route::get('/{page}', 'getAllAuthPost')->name('auth.all');
+            Route::put('/{id}', 'update')->name('auth.update');
             Route::get('/read/{page}', 'getOneAuthPost')->name('auth.one');
         });
 

@@ -125,6 +125,40 @@ class PostsController extends Controller
         }
     }
     /**
+     * restore post was deleted
+     *
+     * @param  int $id
+     * @return JsonResponse
+     */
+    public function restore(int $id): JsonResponse
+    {
+        DB::beginTransaction();
+        try {
+            $category = Posts::withTrashed()->findOrFail($id)->restore();
+
+            DB::commit();
+
+            return ReturnMessage::message(
+                false,
+                'Post restored with success',
+                'Post restored with success',
+                null,
+                $category,
+                200
+            );
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return ReturnMessage::message(
+                true,
+                $e->getMessage(),
+                $e->getMessage(),
+                null,
+                null,
+                400
+            );
+        }
+    }
+    /**
      * getAll
      *
      * @param  int $page
