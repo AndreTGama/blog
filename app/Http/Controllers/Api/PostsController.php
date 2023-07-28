@@ -174,7 +174,7 @@ class PostsController extends Controller
         try {
             $skip = ($page -1) * 12;
             $posts = Posts::skip($skip)->take(12)->where('aprove', true)->get();
-
+            
             return ReturnMessage::message(
                 false,
                 'All posts in system',
