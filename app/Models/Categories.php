@@ -18,4 +18,12 @@ class Categories extends Model
     protected $casts = [
         'deleted_at' => 'datetime',
     ];
+
+    /**
+     * Get post.
+     */
+    public function posts()
+    {
+        return $this->belongsToMany(Posts::class, 'posts_has_categories', 'category_id', 'post_id');
+    }
 }

@@ -2,7 +2,10 @@
 
 namespace App\Exceptions;
 
+use App\Builder\ReturnMessage;
+use Exception;
 use Illuminate\Foundation\Exceptions\Handler as ExceptionHandler;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 use Throwable;
 
 class Handler extends ExceptionHandler
@@ -23,8 +26,43 @@ class Handler extends ExceptionHandler
      */
     public function register(): void
     {
-        $this->reportable(function (Throwable $e) {
-            //
+        $this->renderable(function (NotFoundHttpException $e) {
+            return ReturnMessage::message(
+                true,
+                'Route not found',
+                $e->getMessage(),
+                $e,
+                [
+                    'file' => $e->getFile(),
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'line' => $e->getLine()
+                ],
+            404);
+        });
+
+        $this->renderable(function (Exception $e) {
+            return ReturnMessage::message(
+                true,
+                'An unexpected error occurred',
+                $e->getMessage(),
+                $e,
+                [
+                    'file' => $e->getFile(),
+                    'message' => $e->getMessage(),
+                    'code' => $e->getCode(),
+                    'line' => $e->getLine()
+                ],
+            500);
+        });
+
+        $this->renderable(function (Throwable $e) {
+            return ReturnMessage::message(
+                true,
+                'Something wrong',
+                $e->getMessage(),
+                null,null,
+            500);
         });
     }
 }

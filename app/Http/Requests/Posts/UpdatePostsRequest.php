@@ -3,6 +3,7 @@
 namespace App\Http\Requests\Posts;
 
 use App\Builder\ReturnMessage;
+use App\Rules\Posts\ArrayCategoriesExist;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
@@ -32,6 +33,7 @@ class UpdatePostsRequest extends FormRequest
                 Rule::unique('posts')->ignore($this->route('id'))
             ],
             'post' => 'required',
+            'categories_ids' => ['array', new ArrayCategoriesExist]
         ];
     }
     /**

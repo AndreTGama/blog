@@ -1,14 +1,13 @@
 <?php
 
-namespace App\Http\Requests\Posts;
+namespace App\Http\Requests\Comments;
 
 use App\Builder\ReturnMessage;
-use App\Rules\Posts\ArrayCategoriesExist;
 use Illuminate\Contracts\Validation\Validator;
 use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StorePostsRequest extends FormRequest
+class StoreCommentsRequest extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,9 +25,7 @@ class StorePostsRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'title' => 'required|max:255|unique:posts',
-            'post' => 'required',
-            'categories_ids' => ['array', new ArrayCategoriesExist]
+            'comment' => 'required|min:5|max:255',
         ];
     }
     /**

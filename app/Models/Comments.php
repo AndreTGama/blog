@@ -12,14 +12,24 @@ class Comments extends Model
 
     protected $fillable = [
         'comment',
-        'comment',
         'aprove',
         'author_id',
         'post_id',
-        'post_id'
+        'moderator_id'
     ];
 
     protected $casts = [
+        'created_at' => 'datetime',
+        'updated_at' => 'datetime',
         'deleted_at' => 'datetime',
     ];
+    /**
+     * Get Posts made by users
+     *
+     * @return void
+     */
+    public function posts()
+    {
+        return $this->belongsTo(Posts::class, 'post_id', 'id');
+    }
 }

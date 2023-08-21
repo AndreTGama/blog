@@ -7,6 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Posts\StorePostsRequest;
 use App\Http\Requests\Posts\UpdatePostsRequest;
 use App\Models\Posts;
+use App\Models\PostsHasCategories;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
 
@@ -23,7 +24,7 @@ class PostsController extends Controller
         DB::beginTransaction();
 
         try {
-            $data = $req->all();
+            $data = $req->validated();
             $authId = auth()->user()->id;
 
             $post = Posts::create([
@@ -32,6 +33,20 @@ class PostsController extends Controller
                 'author_id' => $authId
             ]);
 
+            if ($data['categories_ids']) {
+                $categories = $data['categories_ids'];
+                foreach ($categories as $category) {
+                    PostsHasCategories::create([
+                        'post_id' => $post->id,
+                        'category_id' => $category
+                    ]);
+                }
+            } else {
+                PostsHasCategories::create([
+                    'post_id' => $post->id,
+                    'category_id' => 1
+                ]);
+            }
             DB::commit();
             return ReturnMessage::message(
                 false,
@@ -41,12 +56,10 @@ class PostsController extends Controller
                 $post,
                 200
             );
-
         } catch (\Exception $e) {
             DB::rollBack();
-            return ReturnMessage::message(true, $e->getMessage(),$e->getMessage(),null, null, 400);
+            return ReturnMessage::message(true, $e->getMessage(), $e->getMessage(), null, null, 400);
         }
-
     }
     /**
      * update
@@ -60,7 +73,7 @@ class PostsController extends Controller
         DB::beginTransaction();
 
         try {
-            $data = $req->all();
+            $data = $req->validated();
             $authId = auth()->user()->id;
 
             $post = Posts::withTrashed()->where('id', $id)->first();
@@ -73,6 +86,23 @@ class PostsController extends Controller
                 'author_id' => $authId
             ]);
 
+            PostsHasCategories::withTrashed()->where('post_id', $id)->forceDelete();
+
+            if ($data['categories_ids']) {
+                $categories = $data['categories_ids'];
+                foreach ($categories as $category) {
+                    PostsHasCategories::create([
+                        'post_id' => $id,
+                        'category_id' => $category
+                    ]);
+                }
+            } else {
+                PostsHasCategories::create([
+                    'post_id' => $id,
+                    'category_id' => 1
+                ]);
+            }
+
             DB::commit();
             return ReturnMessage::message(
                 false,
@@ -82,14 +112,12 @@ class PostsController extends Controller
                 $post,
                 200
             );
-
         } catch (\Exception $e) {
             DB::rollBack();
-            return ReturnMessage::message(true, $e->getMessage(),$e->getMessage(),null, null, 400);
+            return ReturnMessage::message(true, $e->getMessage(), $e->getMessage(), null, null, 400);
         }
-
     }
-        /**
+    /**
      * desactive post in database
      *
      * @param  int $id
@@ -170,11 +198,15 @@ class PostsController extends Controller
             It is possible to use laravel's pagination(), but for the features that I will do in the APP,
             I didn't see the need to use it
         */
-
         try {
-            $skip = ($page -1) * 12;
-            $posts = Posts::skip($skip)->take(12)->where('aprove', true)->get();
-            
+            $skip = ($page - 1) * 12;
+            $posts = Posts::skip($skip)->take(12)->where('aprove', true)
+                ->with('categories')
+                ->with(['comments' => function ($q) {
+                    $q->where('aprove', true);
+                }])
+            ->get();    
+
             return ReturnMessage::message(
                 false,
                 'All posts in system',
@@ -205,7 +237,7 @@ class PostsController extends Controller
         try {
             $authId = auth()->user()->id;
 
-            $skip = ($page -1) * 12;
+            $skip = ($page - 1) * 12;
             $posts = Posts::skip($skip)->take(12)->where(['author_id' => $authId])->get();
 
             return ReturnMessage::message(
@@ -243,7 +275,7 @@ class PostsController extends Controller
                 'author_id' => $authId
             ])->first();
 
-            if(empty($post)) throw new \Exception('Post Not Found');
+            if (empty($post)) throw new \Exception('Post Not Found');
 
             return ReturnMessage::message(
                 false,
@@ -278,7 +310,7 @@ class PostsController extends Controller
                 'aprove' => true
             ])->first();
 
-            if(empty($post)) throw new \Exception('Post Not Found');
+            if (empty($post)) throw new \Exception('Post Not Found');
 
             return ReturnMessage::message(
                 false,
@@ -307,8 +339,8 @@ class PostsController extends Controller
      */
     public function getAllModerator(int $page): JsonResponse
     {
-      try {
-            $skip = ($page -1) * 12;
+        try {
+            $skip = ($page - 1) * 12;
             $posts = Posts::skip($skip)->take(12)->whereNull('moderator_id')->get();
 
             return ReturnMessage::message(
@@ -373,8 +405,8 @@ class PostsController extends Controller
         DB::beginTransaction();
         try {
             $post = Posts::findOrFail($id);
-            if($post->aprove) throw new \Exception('Post has already been approved');
-            if(!$post->aprove && $post->moderator_id)
+            if ($post->aprove) throw new \Exception('Post has already been approved');
+            if (!$post->aprove && $post->moderator_id)
                 throw new \Exception('Post has already been desaproved');
 
             $post->update([
@@ -414,8 +446,8 @@ class PostsController extends Controller
         DB::beginTransaction();
         try {
             $post = Posts::findOrFail($id);
-            if($post->aprove) throw new \Exception('Post has already been approved');
-            if(!$post->aprove && $post->moderator_id)
+            if ($post->aprove) throw new \Exception('Post has already been approved');
+            if (!$post->aprove && $post->moderator_id)
                 throw new \Exception('Post has already been desaproved');
 
             $post->update([
@@ -454,7 +486,7 @@ class PostsController extends Controller
     {
         DB::beginTransaction();
         try {
-            $post = Posts::withTrashed()->where('id',$id)->first();
+            $post = Posts::withTrashed()->where('id', $id)->first();
             $post->forceDelete();
 
             DB::commit();
