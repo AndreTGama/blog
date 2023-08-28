@@ -32,4 +32,22 @@ class Comments extends Model
     {
         return $this->belongsTo(Posts::class, 'post_id', 'id');
     }
+    /**
+     * Get Author comment
+     *
+     * @return void
+     */
+    public function author()
+    {
+        return $this->belongsTo(User::class, 'author_id', 'id');
+    }
+    /**
+     * Get Moderator in comment
+     *
+     * @return void
+     */
+    public function moderator()
+    {
+        return $this->belongsTo(User::class, 'moderator_id', 'id');
+    }
 }

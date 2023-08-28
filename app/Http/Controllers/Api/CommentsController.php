@@ -71,15 +71,15 @@ class CommentsController extends Controller
     /**
      * getOneAuthComments
      *
-     * @param  int $idComment
+     * @param  int $id
      * @return JsonResponse
      */
-    public function getOneAuthComments(int $idComment): JsonResponse
+    public function getOneAuthComments(int $id): JsonResponse
     {
         $authId = auth()->user()->id;
         $comment = Comments::where([
             'author_id' => $authId,
-            'id' => $idComment
+            'id' => $id
         ])->with('posts')
             ->get();
 
@@ -102,6 +102,8 @@ class CommentsController extends Controller
         $skip = ($page - 1) * 12;
         $comments = Comments::withTrashed()->skip($skip)->take(12)
             ->with('posts')
+            ->with('author')
+            ->with('moderator')
             ->get();
 
         $allComments = Comments::withTrashed()->get();
@@ -122,15 +124,15 @@ class CommentsController extends Controller
     /**
      * getOneModerator
      *
-     * @param  mixed $idComment
+     * @param  int $id
      * @return JsonResponse
      */
-    public function getOneModerator(int $idComment): JsonResponse
+    public function getOneModerator(int $id): JsonResponse
     {
         $comment = Comments::where([
-            'id' => $idComment
+            'id' => $id
         ])->withTrashed()
-            ->with('posts')
+            ->with(['posts', 'author', 'moderator'])
             ->get();
 
         return ReturnMessage::message(
@@ -141,5 +143,80 @@ class CommentsController extends Controller
             $comment,
             200
         );
+    }
+    /**
+     * aprove
+     *
+     * @param  int $id
+     * @return JsonResponse
+     */
+    public function aprove(int $id): JsonResponse
+    {
+        $comment = Comments::findOrFail($id);
+        if ($comment->aprove) throw new ApiException('Post has already been approved');
+        if (!$comment->aprove && $comment->moderator_id)
+            throw new ApiException('Post has already been desaproved');
+
+        $comment->update([
+            'aprove' => true,
+            'moderator_id' => auth()->user()->id
+        ]);
+
+        return ReturnMessage::message(
+            false,
+            'Comment aproved',
+            'Comment aproved',
+            null,
+            $comment,
+            200
+        );
+    }
+    /**
+     * desaprove
+     *
+     * @param  int $id
+     * @return JsonResponse
+     */
+    public function desaprove(int $id): JsonResponse
+    {
+        $comment = Comments::findOrFail($id);
+        if ($comment->aprove) throw new ApiException('Comment has already been approved');
+        if (!$comment->aprove && $comment->moderator_id)
+            throw new ApiException('Comment has already been desaproved');
+
+        $comment->update([
+            'aprove' => false,
+            'moderator_id' => auth()->user()->id
+        ]);
+
+        return ReturnMessage::message(
+            false,
+            'Comment desaproved',
+            'Comment desaproved',
+            null,
+            $comment,
+            200
+        );
+    }
+    /**
+     * destroy
+     *
+     * @param  int $id
+     * @return JsonResponse
+     */
+    public function destroy(int $id): JsonResponse
+    {
+        $comment = Comments::withTrashed()->where('id', $id)->first();
+        $comment->forceDelete();
+
+        return ReturnMessage::message(
+            false,
+            'Comment destroyed with success',
+            'Comment destroyed with success',
+            null,
+            $comment,
+            200
+        );
+
     }
 }

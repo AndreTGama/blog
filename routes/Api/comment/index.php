@@ -8,6 +8,7 @@ use Illuminate\Support\Facades\Route;
 Route::group([
     'controller' => CommentsController::class,
     'as' => 'comments.',
+    'prefix' => 'comments',
     'middleware' => 'auth.jwt',
 ], function () {
 
