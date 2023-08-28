@@ -203,27 +203,19 @@ class UsersControllers extends Controller
      */
     public function getAll(): JsonResponse
     {
-        try {
-            $users = User::all();
+        $take = 10;
 
-            return ReturnMessage::message(
-                false,
-                'All users in system',
-                'All users in system',
-                null,
-                $users,
-                200
-            );
-        } catch (\Exception $e) {
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        if(request()->query('take')) $take = request()->query('take');
+        $users = User::paginate($take);
+
+        return ReturnMessage::message(
+            false,
+            'All users in system',
+            'All users in system',
+            null,
+            $users,
+            200
+        );
     }
     /**
      * getOne
