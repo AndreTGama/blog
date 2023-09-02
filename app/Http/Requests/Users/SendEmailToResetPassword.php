@@ -4,12 +4,12 @@ namespace App\Http\Requests\Users;
 
 use App\Builder\ReturnMessage;
 use App\Exceptions\ApiException;
-use App\Rules\Users\FullName;
-use Illuminate\Foundation\Http\FormRequest;
+use App\Rules\Users\CheckEmail;
 use Illuminate\Contracts\Validation\Validator;
+use Illuminate\Foundation\Http\FormRequest;
 use Illuminate\Http\Exceptions\HttpResponseException;
 
-class StoreUsersRequest extends FormRequest
+class SendEmailToResetPassword extends FormRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -27,9 +27,7 @@ class StoreUsersRequest extends FormRequest
     public function rules(): array
     {
         return [
-            'name' => ['required', 'max:255', new FullName],
-            'email' => 'required|unique:users|max:255',
-            'password' => 'required',
+            'email' => ['required', new CheckEmail],
         ];
     }
     /**
@@ -43,9 +41,6 @@ class StoreUsersRequest extends FormRequest
 
         foreach ($messages as $m) {
             array_push($errors, $m[0]);
-
-            if($m[0] == 'The email has already been taken.')
-                throw new ApiException($m[0], 409);
         }
 
         throw new HttpResponseException(

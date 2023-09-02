@@ -11,6 +11,8 @@ Route::group([
     'as' => 'users.',
 ], function () {
     Route::post('/', 'store')->name('create');
+    Route::post('/reset-password', 'sendEmailToResetPassword')->name('email.reset.password');
+    Route::put('/reset-password', 'sendEmailToResetPassword')->name('reset.password');
 
     Route::group(['middleware' => 'auth.jwt'], function () {
         Route::group(['prefix' => 'my-profile'], function () {

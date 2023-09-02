@@ -4,8 +4,10 @@ namespace App\Http\Controllers\Api;
 
 use App\Builder\ReturnMessage;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\Users\SendEmailToResetPassword;
 use App\Http\Requests\Users\StoreUsersRequest;
 use App\Http\Requests\Users\UpdateUsersRequest;
+use App\Models\ResetPassword;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
@@ -13,49 +15,34 @@ use Illuminate\Support\Facades\DB;
 class UsersControllers extends Controller
 {
     /**
-     * store
+     * Store a new user record in the database.
      *
      * @param  StoreUsersRequest $req
      * @return JsonResponse
      */
     public function store(StoreUsersRequest $req): JsonResponse
     {
-        try {
-            DB::beginTransaction();
+        $data = $req->all();
 
-            $data = $req->all();
+        $user = User::create([
+            'name' => $data['name'],
+            'email' => $data['email'],
+            'password' => $data['password'],
+            'type_user_id' => 3,
+            'photo_name' => 'user_default.png',
+        ]);
 
-            $user = User::create([
-                'name' => $data['name'],
-                'email' => $data['email'],
-                'password' => $data['password'],
-                'type_user_id' => 3,
-                'photo_name' => 'user_default.png',
-            ]);
-            DB::commit();
-
-            return ReturnMessage::message(
-                false,
-                'Account created with success',
-                'Account created with success',
-                null,
-                $user,
-                200
-            );
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        return ReturnMessage::message(
+            false,
+            'Account created with success',
+            'Account created with success',
+            null,
+            $user,
+            201
+        );
     }
     /**
-     * update
+     * Update an existing user record in the database.
      *
      * @param  UpdateUsersRequest $req
      * @param  int $id
@@ -356,6 +343,11 @@ class UsersControllers extends Controller
             );
         }
     }
+    /**
+     * destroyProfileLoged
+     *
+     * @return JsonResponse
+     */
     public function destroyProfileLoged(): JsonResponse
     {
         try {
@@ -385,5 +377,51 @@ class UsersControllers extends Controller
                 400
             );
         }
+    }
+    /**
+     * sendEmailToResetPassword
+     *
+     * @return JsonResponse
+     */
+    public function sendEmailToResetPassword(SendEmailToResetPassword $req): JsonResponse
+    {
+        $data = $req->validated();
+        $ip = $req->ip();
+        $email = $data['email'];
+        $user = User::withTrashed()->where('email', $email)->first();
+
+        $code = uniqid();
+
+        $resetsPasswordsUser = ResetPassword::where(['user_id' => $user->id, 'used' => false])->get();
+
+        if(!empty($resetsPasswordsUser)) {
+            foreach($resetsPasswordsUser as $reset) {
+                ResetPassword::find($reset->id)->delete();
+            }
+        }
+
+        ResetPassword::create([
+            'code' => $code,
+            'ip' => $ip,
+            'user_id' => $user->id
+        ]);
+
+        return ReturnMessage::message(
+            false,
+            'Code has been sent to your email.',
+            'Code has been sent to your email.',
+            null,
+            null,
+            200
+        );
+    }
+    /**
+     * resetPassword
+     *
+     * @return JsonResponse
+     */
+    public function resetPassword(): JsonResponse
+    {
+
     }
 }
