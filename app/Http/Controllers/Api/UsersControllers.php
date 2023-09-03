@@ -6,11 +6,15 @@ use App\Builder\ReturnMessage;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\SendEmailToResetPassword;
 use App\Http\Requests\Users\StoreUsersRequest;
+use App\Http\Requests\Users\UpdatePassword;
 use App\Http\Requests\Users\UpdateUsersRequest;
+use App\Mail\sendCodeToForgetPassword;
+use App\Mail\sendWelcome;
 use App\Models\ResetPassword;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Mail;
 
 class UsersControllers extends Controller
 {
@@ -31,6 +35,9 @@ class UsersControllers extends Controller
             'type_user_id' => 3,
             'photo_name' => 'user_default.png',
         ]);
+
+        $mail = new sendWelcome($user);
+        Mail::to($data['email'])->send($mail);
 
         return ReturnMessage::message(
             false,
@@ -406,6 +413,9 @@ class UsersControllers extends Controller
             'user_id' => $user->id
         ]);
 
+        $mail = new sendCodeToForgetPassword($user, $code);
+        Mail::to($data['email'])->send($mail);
+
         return ReturnMessage::message(
             false,
             'Code has been sent to your email.',
@@ -420,8 +430,27 @@ class UsersControllers extends Controller
      *
      * @return JsonResponse
      */
-    public function resetPassword(): JsonResponse
+    public function resetPassword(UpdatePassword $req): JsonResponse
     {
+        $data = $req->validated();
+        $code = $data['code'];
+        $password = $data['password'];
 
+        $resetPassword = ResetPassword::where('code', $code)->first();
+
+        ResetPassword::find($resetPassword->id)->update(['used' => true]);
+
+        User::find($resetPassword->user_id)->update([
+            'password' => $password
+        ]);
+
+        return ReturnMessage::message(
+            false,
+            'Update Password.',
+            'Update Password.',
+            null,
+            null,
+            200
+        );
     }
 }
