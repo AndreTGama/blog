@@ -25,8 +25,8 @@ Route::group([
         Route::get('/', 'getAll')->name('get.all');
         Route::get('/{id}', 'getOne')->name('get.one');
         Route::put('/{id}', 'update')->name('get.one.update');
-        Route::delete('/{id}', 'delete')->name('get.one.update');
+        Route::delete('/{id}', 'delete')->name('get.one.delete');
         Route::put('/restore/{id}', 'restore')->name('get.one.restore');
-        Route::delete('/destroy/{id}', 'destroy')->name('get.one.update');
+        Route::delete('/destroy/{id}', 'destroy')->name('get.one.destroy');
     });
 });

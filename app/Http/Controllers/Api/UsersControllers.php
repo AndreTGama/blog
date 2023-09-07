@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Api;
 
 use App\Builder\ReturnMessage;
+use App\Exceptions\ApiException;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Users\SendEmailToResetPassword;
 use App\Http\Requests\Users\StoreUsersRequest;
@@ -94,31 +95,16 @@ class UsersControllers extends Controller
      */
     public function delete(int $id): JsonResponse
     {
-        try {
-            DB::beginTransaction();
+        $user = User::findOrFail($id)->delete();
 
-            $user = User::findOrFail($id)->delete();
-            DB::commit();
-
-            return ReturnMessage::message(
-                false,
-                'Account deleted with success',
-                'Account deleted with success',
-                null,
-                $user,
-                200
-            );
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        return ReturnMessage::message(
+            false,
+            'Account deleted with success',
+            'Account deleted with success',
+            null,
+            $user,
+            200
+        );
     }
     /**
      * restore
@@ -128,33 +114,18 @@ class UsersControllers extends Controller
      */
     public function restore(int $id): JsonResponse
     {
-        try {
-            DB::beginTransaction();
+        $user = User::withTrashed()->find($id)->restore();
 
-            $user = User::withTrashed()->find($id)->restore();
-            DB::commit();
-
-            return ReturnMessage::message(
-                false,
-                'Account restored with success',
-                'Account restored with success',
-                null,
-                $user,
-                200
-            );
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        return ReturnMessage::message(
+            false,
+            'Account restored with success',
+            'Account restored with success',
+            null,
+            $user,
+            200
+        );
     }
-        /**
+    /**
      * delete
      *
      * @param  int $id
@@ -162,31 +133,16 @@ class UsersControllers extends Controller
      */
     public function destroy(int $id): JsonResponse
     {
-        try {
-            DB::beginTransaction();
+        $user = User::where('id', $id)->forceDelete();
 
-            $user = User::where('id', $id)->forceDelete();
-            DB::commit();
-
-            return ReturnMessage::message(
-                false,
-                'Account destroyed with success',
-                'Account destroyed with success',
-                null,
-                $user,
-                200
-            );
-        } catch (\Exception $e) {
-            DB::rollBack();
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        return ReturnMessage::message(
+            false,
+            'Account destroyed with success',
+            'Account destroyed with success',
+            null,
+            $user,
+            200
+        );
     }
     /**
      * getAll
@@ -199,7 +155,7 @@ class UsersControllers extends Controller
     {
         $take = 10;
 
-        if(request()->query('take')) $take = request()->query('take');
+        if (request()->query('take')) $take = request()->query('take');
         $users = User::paginate($take);
 
         return ReturnMessage::message(
@@ -219,30 +175,19 @@ class UsersControllers extends Controller
      */
     public function getOne(int $id): JsonResponse
     {
-        try {
-            $users = User::findOrFail($id);
+        $users = User::findOrFail($id);
 
-            $users->posts = $users->posts();
-            $users->comments = $users->comments();
+        $users->posts = $users->posts();
+        $users->comments = $users->comments();
 
-            return ReturnMessage::message(
-                false,
-                'All users in system',
-                'All users in system',
-                null,
-                $users,
-                200
-            );
-        } catch (\Exception $e) {
-            return ReturnMessage::message(
-                false,
-                $e->getMessage(),
-                $e->getMessage(),
-                null,
-                [],
-                400
-            );
-        }
+        return ReturnMessage::message(
+            false,
+            'All users in system',
+            'All users in system',
+            null,
+            $users,
+            200
+        );
     }
     /**
      * getProfileLoged
@@ -401,8 +346,8 @@ class UsersControllers extends Controller
 
         $resetsPasswordsUser = ResetPassword::where(['user_id' => $user->id, 'used' => false])->get();
 
-        if(!empty($resetsPasswordsUser)) {
-            foreach($resetsPasswordsUser as $reset) {
+        if (!empty($resetsPasswordsUser)) {
+            foreach ($resetsPasswordsUser as $reset) {
                 ResetPassword::find($reset->id)->delete();
             }
         }
@@ -437,6 +382,8 @@ class UsersControllers extends Controller
         $password = $data['password'];
 
         $resetPassword = ResetPassword::where('code', $code)->first();
+        if ($resetPassword->used)
+            throw new ApiException('Code was used', 409);
 
         ResetPassword::find($resetPassword->id)->update(['used' => true]);
 
