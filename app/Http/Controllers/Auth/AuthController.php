@@ -7,7 +7,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Auth\LoginRequest;
 use App\Http\Resources\Auth\LoginResource;
 use App\Http\Resources\User\UserResource;
-use App\Http\Responses\ApiResponse;
+use App\Responses\ApiResponse;
 use App\Services\Auth\AuthService;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
@@ -16,6 +16,33 @@ class AuthController extends Controller
 {
     public function __construct(protected AuthService $authService) {}
 
+    /**
+     * Authenticate a user with provided credentials.
+     *
+     * @param LoginRequest $request The login request containing validated credentials
+     * @return JsonResponse JSON response containing authentication result
+     *
+     * @throws \Exception Caught and handled within the method
+     *
+     * @example
+     * // Success response (status 200):
+     * {
+     *     "success": true,
+     *     "message": "Login successful.",
+     *     "data": {
+     *         "id": 1,
+     *         "email": "user@example.com",
+     *         "token": "..."
+     *     }
+     * }
+     *
+     * // Error response (status 500):
+     * {
+     *     "success": false,
+     *     "message": "Login failed.",
+     *     "exception": "..."
+     * }
+     */
     public function login(LoginRequest $request): JsonResponse
     {
         try {
@@ -26,13 +53,13 @@ class AuthController extends Controller
             );
 
             return ApiResponse::success(
-                message: __('login.login.success'),
+                message: 'Login successful.',
                 data: new LoginResource($data),
                 status: 200
             );
         } catch (\Exception $e) {
             return ApiResponse::error(
-                message: __('login.login.error'),
+                message: 'Login failed.',
                 exception: $e->getMessage(),
                 status: 500
             );
@@ -57,13 +84,13 @@ class AuthController extends Controller
         try {
             $data = $this->authService->me();
             return ApiResponse::success(
-                message: __('return.show.success', ['name' => __('user.singular')]),
+                message: 'User retrieved successfully.',
                 data: new UserResource($data),
                 status: 200
             );
         } catch (\Exception $e) {
             return ApiResponse::error(
-                message: __('return.show.error', ['name' => __('user.singular')]),
+                message: 'Failed to retrieve user.',
                 exception: $e->getMessage(),
                 status: 500
             );
@@ -88,13 +115,13 @@ class AuthController extends Controller
         try {
             $this->authService->logout($request);
             return ApiResponse::success(
-                message: __('login.logout.success'),
+                message: 'Logout successful.',
                 data: null,
                 status: 200
             );
         } catch (\Exception $e) {
             return ApiResponse::error(
-                message: __('login.logout.error'),
+                message: 'Logout failed.',
                 exception: $e->getMessage(),
                 status: 500
             );
