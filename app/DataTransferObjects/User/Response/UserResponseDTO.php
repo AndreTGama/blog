@@ -1,7 +1,8 @@
 <?php
 
-namespace App\DataTransferObjects\Users\Response;
+namespace App\DataTransferObjects\User\Response;
 
+use App\Models\Role;
 use App\Models\User;
 
 class UserResponseDTO
@@ -16,7 +17,7 @@ class UserResponseDTO
         public string  $name,
         public string  $email,
         public ?string $email_verified_at,
-        public ?string $last_login,
+        public Role $role,
         public string  $created_at,
         public string  $updated_at,
     ) {}

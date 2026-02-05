@@ -18,14 +18,16 @@ return Application::configure(basePath: dirname(__DIR__))
         commands: __DIR__ . '/../routes/console.php',
         health: '/up',
     )
-    ->withMiddleware(function (Middleware $middleware): void {
-        //
+    ->withMiddleware(function (Middleware $middleware) {
+        $middleware->alias([
+            'auth' => \App\Http\Middleware\AuthenticateApi::class,
+        ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         $exceptions->render(function (Throwable $e, Request $request) {
             if ($e instanceof ValidationException) {
                 return ApiResponse::error(
-                    message: __('return.validation_error'),
+                    message: 'Validation failed.',
                     exception: $e->getMessage(),
                     data: [
                         'errors' => $e->validator->errors(),
@@ -36,7 +38,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof AuthenticationException) {
                 return ApiResponse::error(
-                    message: __('return.unlogged'),
+                    message: 'You are not logged in.',
                     exception: $e->getMessage(),
                     data: [],
                     status: 401
@@ -45,7 +47,7 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof QueryException) {
                 return ApiResponse::error(
-                    message: __('return.database.error'),
+                    message: 'Database error occurred.',
                     exception: $e->getMessage(),
                     data: [],
                     status: 500
@@ -54,22 +56,22 @@ return Application::configure(basePath: dirname(__DIR__))
 
             if ($e instanceof RouteNotFoundException) {
                 return ApiResponse::error(
-                    message: __('return.page.not_found'),
+                    message: 'Page not found.',
                     exception: $e->getMessage(),
                     data: [],
-                    status: 500
+                    status: 404
                 );
             }
             if ($e instanceof AccessDeniedHttpException) {
                 return ApiResponse::error(
-                    message: __('return.unauthorized'),
+                    message: 'You are not authorized to access this resource.',
                     exception: $e->getMessage(),
                     data: [],
                     status: 403
                 );
             }
             return ApiResponse::error(
-                message: __('return.unexpected_error'),
+                message: 'An unexpected error occurred.',
                 exception: $e->getMessage(),
                 data: [],
                 status: 500

@@ -18,7 +18,7 @@ class LoginResource extends JsonResource
         return [
             'access_token' => $this->access_token,
             'token_type'   => $this->token_type,
-            'user'  => new UserResource($this->user),
+            'user'         => new UserResource($this->user),
         ];
     }
 }

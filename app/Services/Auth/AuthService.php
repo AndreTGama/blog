@@ -4,7 +4,7 @@ namespace App\Services\Auth;
 
 use App\DataTransferObjects\Auth\Request\LoginCredentialsDTO;
 use App\DataTransferObjects\Auth\Response\LoginResponseDTO;
-use App\DataTransferObjects\Users\Response\UserResponseDTO;
+use App\DataTransferObjects\User\Response\UserResponseDTO;
 use App\Exceptions\InvalidCredentialsException;
 use App\Models\User;
 use Illuminate\Http\Request;
@@ -82,7 +82,7 @@ class AuthService
             name: $user->name,
             email: $user->email,
             email_verified_at: $user->email_verified_at,
-            last_login: $user->last_login,
+            role: $user->role,
             created_at: $user->created_at,
             updated_at: $user->updated_at,
         );
