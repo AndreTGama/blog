@@ -12,15 +12,12 @@ class UserPolicy
      */
     public function viewAny(User $user): bool
     {
-        return false;
+        return $user->role?->name === 'admin';
     }
 
-    /**
-     * Determine whether the user can view the model.
-     */
     public function view(User $user, User $model): bool
     {
-        return false;
+        return $user->role?->name === 'admin';
     }
 
     /**
@@ -28,7 +25,7 @@ class UserPolicy
      */
     public function create(User $user): bool
     {
-        return $user->role && $user->role->name === 'admin';
+        return $user->role?->name === 'admin';
     }
 
     /**

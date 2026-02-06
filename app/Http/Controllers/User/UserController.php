@@ -4,15 +4,38 @@ namespace App\Http\Controllers\User;
 
 use App\DataTransferObjects\User\Request\StoreUserDTO;
 use App\Http\Controllers\Controller;
+use App\Http\Requests\User\IndexUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Resources\Common\PaginatedResource;
+use App\Http\Resources\User\UserResource;
 use App\Responses\ApiResponse;
-use App\Http\Services\User\UserService;
+use App\Services\User\UserService;
 use App\Models\User;
 
 class UserController extends Controller
 {
     public function __construct(private UserService $userService) {}
 
+    /**
+     * Retrieve a paginated list of users.
+     *
+     * @param IndexUserRequest $request The request object containing pagination and filter parameters.
+     *
+     * @return \Illuminate\Http\JsonResponse A JSON response containing paginated user data.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the user is not authorized to view users.
+     */
+    public function index(IndexUserRequest $request)
+    {
+        $this->authorize('viewAny', User::class);
+        $data = $this->userService->index(dto: $request->toDTO());
+
+        return ApiResponse::success(
+            message: 'Users retrieved successfully.',
+            data: new PaginatedResource($data, UserResource::class),
+            status: 200
+        );
+    }
     /**
      * Store a new user in the system.
      *

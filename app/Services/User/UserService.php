@@ -1,20 +1,49 @@
 <?php
 
-namespace App\Http\Services\User;
+namespace App\Services\User;
 
+use App\DataTransferObjects\User\Request\IndexUsersDTO;
 use App\DataTransferObjects\User\Request\StoreUserDTO;
 use App\Models\User;
+use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class UserService
 {
-    
+
     /**
      * UserService constructor.
      * Initializes a new instance of the UserService class.
      */
-    public function __construct()
+    public function __construct() {}
+
+    /**
+     * Retrieve a paginated list of users with optional filtering and sorting.
+     *
+     * @param IndexUsersDTO $dto Data transfer object containing filter criteria,
+     *                           sorting parameters, and pagination settings.
+     *                           - filters['search']: Optional search term to filter users by name or email
+     *                           - orderBy: Field name to sort results by
+     *                           - orderDirection: Sort direction ('asc' or 'desc')
+     *                           - limit: Number of results per page
+     *                           - page: Current page number
+     *
+     * @return LengthAwarePaginator Paginated collection of users matching the specified criteria
+     */
+    public function index(IndexUsersDTO $dto): LengthAwarePaginator
     {
-        
+        $query = User::query();
+
+        if (!empty($dto->filters['search'])) {
+            $searchTerm = $dto->filters['search'];
+            $query->where(function ($q) use ($searchTerm) {
+                $q->where('name', 'like', "%{$searchTerm}%")
+                    ->orWhere('email', 'like', "%{$searchTerm}%");
+            });
+        }
+
+        $query->orderBy($dto->orderBy, $dto->orderDirection);
+
+        return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
     }
 
     /**
@@ -23,7 +52,7 @@ class UserService
      * @param StoreUserDTO $data Data transfer object containing user information.
      * @return User The newly created user instance.
      */
-    public function store(StoreUserDTO $data)
+    public function store(StoreUserDTO $data): User
     {
         return User::create($data->toArray());
     }
