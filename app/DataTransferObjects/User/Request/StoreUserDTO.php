@@ -10,13 +10,13 @@ class StoreUserDTO
      * @param string $name     The user's name.
      * @param string $email    The user's email address.
      * @param string $password The user's password.
-     * @param int    $roleId   The ID of the user's role.
+     * @param string    $roleId   The ID of the user's role.
      */
     public function __construct(
         public string $name,
         public string $email,
         public string $password,
-        public int    $roleId
+        public string $roleId
     ) {}
 
     /**
@@ -43,7 +43,7 @@ class StoreUserDTO
      *     name: string,
      *     email: string,
      *     password: string,
-     *     role_id: int
+     *     role_id: string
      * }
      *     Returns an array containing the user's name, email, password, and role ID.
      */
