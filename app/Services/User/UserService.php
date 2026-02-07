@@ -4,6 +4,7 @@ namespace App\Services\User;
 
 use App\DataTransferObjects\User\Request\IndexUsersDTO;
 use App\DataTransferObjects\User\Request\StoreUserDTO;
+use App\DataTransferObjects\User\Request\UpdateUserDTO;
 use App\Models\User;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
@@ -77,29 +78,22 @@ class UserService
      * @param string $id The unique identifier of the user to delete.
      * @return bool Returns true if the user was deleted successfully, false otherwise.
      */
-    public function delete(string $id): bool
+    public function delete(User $user): bool
     {
-        $user = $this->findById($id);
-        if ($user) {
-            return $user->delete();
-        }
-        return false;
+        return $user->delete();
     }
 
+
     /**
-     * Updates the user with the given ID using the provided data.
+     * Update a user with the provided data.
      *
-     * @param string $id The ID of the user to update.
-     * @param StoreUserDTO $data Data transfer object containing the updated user information.
-     * @return User|null Returns the updated User object if found and updated, or null if the user does not exist.
+     * @param User $user The user instance to update.
+     * @param UpdateUserDTO $data The data transfer object containing the user data to update.
+     * @return User The updated user instance, or null if the update fails.
      */
-    public function update(string $id, StoreUserDTO $data): ?User
+    public function update(User $user, UpdateUserDTO $data): User
     {
-        $user = $this->findById($id);
-        if ($user) {
-            $user->update($data->toArray());
-            return $user;
-        }
-        return null;
+        $user->update($data->toArray());
+        return $user;
     }
 }

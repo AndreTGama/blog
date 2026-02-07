@@ -3,9 +3,11 @@
 namespace App\Http\Controllers\User;
 
 use App\DataTransferObjects\User\Request\StoreUserDTO;
+use App\DataTransferObjects\User\Request\UpdateUserDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\User\IndexUserRequest;
 use App\Http\Requests\User\StoreUserRequest;
+use App\Http\Requests\User\UpdateUserRequest;
 use App\Http\Resources\Common\PaginatedResource;
 use App\Http\Resources\User\UserResource;
 use App\Responses\ApiResponse;
@@ -77,6 +79,101 @@ class UserController extends Controller
         } catch (\Exception $e) {
             return ApiResponse::error(
                 message: 'Failed to create user.',
+                exception: $e,
+                data: null,
+                status: 500
+            );
+        }
+    }
+
+    /**
+     * Display the specified user.
+     *
+     * Retrieves a single user by their ID and returns their details as a resource.
+     * Authorization is checked to ensure the authenticated user has permission to view the requested user.
+     *
+     * @param User $user The user instance to be displayed.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the user data.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the user is not authorized to view the requested user.
+     */
+    public function show(User $user)
+    {
+        $this->authorize('view', $user);
+        return ApiResponse::success(
+            message: 'User retrieved successfully.',
+            data: new UserResource($user),
+            status: 200
+        );
+    }
+
+
+    /**
+     * Update a user resource.
+     *
+     * @param UpdateUserRequest $request The validated request containing user update data
+     * @param User $user The user model instance to be updated
+     * @return \Illuminate\Http\JsonResponse JSON response with success or error status
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If user is not authorized to update the resource
+     *
+     * Example response on success:
+     * {
+     *     "success": true,
+     *     "message": "User updated successfully.",
+     *     "data": { ... user data ... },
+     *     "status": 200
+     * }
+     *
+     * Example response on error:
+     * {
+     *     "success": false,
+     *     "message": "Failed to update user.",
+     *     "data": null,
+     *     "status": 500
+     * }
+     */
+    public function update(UpdateUserRequest $request, User $user)
+    {
+        try {
+            $this->authorize('update', $user);
+            $data = $this->userService->update($user, UpdateUserDTO::fromArray($request->validated()));
+            return ApiResponse::success(
+                message: 'User updated successfully.',
+                data: $data,
+                status: 200
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error(
+                message: 'Failed to update user.',
+                exception: $e,
+                data: null,
+                status: 500
+            );
+        }
+    }
+
+    /**
+     * Remove the specified user from storage.
+     *
+     * @param User $user The user instance to be deleted.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating success or failure of the delete operation.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the user is not authorized to delete the requested user.
+     */
+    public function destroy(User $user)
+    {
+        try {
+            $this->authorize('delete', $user);
+            $this->userService->delete($user);
+            return ApiResponse::success(
+                message: 'User deleted successfully.',
+                data: null,
+                status: 200
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error(
+                message: 'Failed to delete user.',
                 exception: $e,
                 data: null,
                 status: 500

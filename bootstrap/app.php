@@ -2,6 +2,7 @@
 
 use App\Responses\ApiResponse;
 use Illuminate\Auth\AuthenticationException;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Database\QueryException;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
@@ -70,6 +71,16 @@ return Application::configure(basePath: dirname(__DIR__))
                     status: 403
                 );
             }
+
+            if ($e instanceof ModelNotFoundException) {
+                return ApiResponse::error(
+                    message: 'Resource not found.',
+                    exception: $e->getMessage(),
+                    data: [],
+                    status: 404
+                );
+            }
+
             return ApiResponse::error(
                 message: 'An unexpected error occurred.',
                 exception: $e->getMessage(),
