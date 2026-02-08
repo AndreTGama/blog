@@ -13,11 +13,26 @@ class CategorySeeder extends Seeder
     public function run(): void
     {
         $data = [
-            ['name' => 'Technology'],
-            ['name' => 'Health'],
-            ['name' => 'Travel'],
-            ['name' => 'Food'],
-            ['name' => 'Education'],
+            [
+                'name' => 'Technology',
+                'slug' => 'technology',
+            ],
+            [
+                'name' => 'Health',
+                'slug' => 'health',
+            ],
+            [
+                'name' => 'Travel',
+                'slug' => 'travel',
+            ],
+            [
+                'name' => 'Food',
+                'slug' => 'food',
+            ],
+            [
+                'name' => 'Education',
+                'slug' => 'education',
+            ],
         ];
         
         foreach ($data as $item) {

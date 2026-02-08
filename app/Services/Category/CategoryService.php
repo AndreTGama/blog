@@ -6,10 +6,13 @@ use App\DataTransferObjects\Category\Request\StoreCategoryDTO;
 use App\DataTransferObjects\Category\Request\UpdateCategoryDTO;
 use App\DataTransferObjects\Common\IndexDTO;
 use App\Models\Category;
+use App\Supports\SlugGenerator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class CategoryService
 {
+
+    public function __construct(private SlugGenerator $slugGenerator) {}
 
     /**
      * Retrieve a paginated list of categories with optional filtering and sorting.
@@ -45,9 +48,12 @@ class CategoryService
      * @param StoreCategoryDTO $dto The data transfer object containing category information
      * @return Category The created category instance
      */
-    public function store(StoreCategoryDTO $dto) : Category
+    public function store(StoreCategoryDTO $dto): Category
     {
-        return Category::create($dto->toArray());
+        $data = $dto->toArray();
+        $slug = $this->slugGenerator->generateUnique($data['name'], 'categories');
+        $data['slug'] = $slug;
+        return Category::create($data);
     }
 
     /**
@@ -59,7 +65,10 @@ class CategoryService
      */
     public function update(Category $category, UpdateCategoryDTO $dto): Category
     {
-        $category->update($dto->toArray());
+        $data = $dto->toArray();
+        $slug = $this->slugGenerator->generateUnique($data['name'], 'categories');
+        $data['slug'] = $slug;
+        $category->update($data);
         return $category;
     }
 
