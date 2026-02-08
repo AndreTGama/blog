@@ -2,7 +2,6 @@
 
 namespace App\Http\Requests\Category;
 
-use App\DataTransferObjects\Common\IndexDTO;
 use App\Http\Requests\Base\IndexRequest;
 
 class IndexCategoryRequest extends IndexRequest
@@ -34,14 +33,4 @@ class IndexCategoryRequest extends IndexRequest
         ];
     }
 
-    public function toDTO(): IndexDTO
-    {
-        return new IndexDTO(
-            limit: $this->limit(),
-            page: $this->page(),
-            orderBy: $this->orderBy(),
-            orderDirection: $this->orderDirection(),
-            filters: $this->filters(),
-        );
-    }
 }

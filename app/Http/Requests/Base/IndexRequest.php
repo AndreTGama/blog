@@ -2,6 +2,7 @@
 
 namespace App\Http\Requests\Base;
 
+use App\DataTransferObjects\Common\IndexDTO;
 use Illuminate\Foundation\Http\FormRequest;
 
 class IndexRequest extends FormRequest
@@ -29,5 +30,16 @@ class IndexRequest extends FormRequest
     public function filters(): array
     {
         return $this->input('filters', []);
+    }
+
+    public function toDTO(): IndexDTO
+    {
+        return new IndexDTO(
+            limit: $this->limit(),
+            page: $this->page(),
+            orderBy: $this->orderBy(),
+            orderDirection: $this->orderDirection(),
+            filters: $this->filters(),
+        );
     }
 }

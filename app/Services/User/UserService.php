@@ -2,6 +2,7 @@
 
 namespace App\Services\User;
 
+use App\DataTransferObjects\Common\IndexDTO;
 use App\DataTransferObjects\User\Request\IndexUsersDTO;
 use App\DataTransferObjects\User\Request\StoreUserDTO;
 use App\DataTransferObjects\User\Request\UpdateUserDTO;
@@ -20,7 +21,7 @@ class UserService
     /**
      * Retrieve a paginated list of users with optional filtering and sorting.
      *
-     * @param IndexUsersDTO $dto Data transfer object containing filter criteria,
+     * @param IndexDTO $dto Data transfer object containing filter criteria,
      *                           sorting parameters, and pagination settings.
      *                           - filters['search']: Optional search term to filter users by name or email
      *                           - orderBy: Field name to sort results by
@@ -30,7 +31,7 @@ class UserService
      *
      * @return LengthAwarePaginator Paginated collection of users matching the specified criteria
      */
-    public function index(IndexUsersDTO $dto): LengthAwarePaginator
+    public function index(IndexDTO $dto): LengthAwarePaginator
     {
         $query = User::query();
 

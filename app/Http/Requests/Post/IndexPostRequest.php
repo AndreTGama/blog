@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Requests\User;
+namespace App\Http\Requests\Post;
 
-use App\DataTransferObjects\User\Request\IndexUsersDTO;
 use App\Http\Requests\Base\IndexRequest;
 
-class IndexUserRequest extends IndexRequest
+class IndexPostRequest extends IndexRequest
 {
     /**
      * Determine if the user is authorized to make this request.
@@ -26,7 +25,7 @@ class IndexUserRequest extends IndexRequest
             'limit' => ['sometimes', 'integer', 'min:1', 'max:100'],
             'page' => ['sometimes', 'integer', 'min:1'],
 
-            'order_by' => ['sometimes', 'string', 'in:created_at,name,email'],
+            'order_by' => ['sometimes', 'string', 'in:created_at,title,content,views, status, published_at'],
             'order_direction' => ['sometimes', 'string', 'in:asc,desc'],
 
             'filters' => ['sometimes', 'array'],

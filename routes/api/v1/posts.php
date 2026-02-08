@@ -1,0 +1,19 @@
+<?php
+
+use App\Http\Controllers\Post\PostController;
+use Illuminate\Support\Facades\Route;
+
+Route::bind('postResource', function ($value) {
+    return App\Models\Post::withTrashed()
+        ->where('id', $value)
+        ->firstOrFail();
+});
+
+Route::middleware('auth:sanctum')->prefix('posts')->group(function () {
+    Route::get('/', [PostController::class, 'index'])->name('posts.index')->withoutMiddleware('auth:sanctum');
+    Route::post('/', [PostController::class, 'store'])->name('posts.store');
+    Route::get('/{postResource}', [PostController::class, 'show'])->name('posts.show')->withoutMiddleware('auth:sanctum');
+    Route::put('/{postResource}', [PostController::class, 'update'])->name('posts.update');
+    Route::delete('/{postResource}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::put('/{postResource}/restore', [PostController::class, 'restore'])->name('posts.restore');
+});
