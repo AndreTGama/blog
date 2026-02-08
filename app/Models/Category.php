@@ -26,6 +26,7 @@ class Category extends Model
         'slug',
     ];
 
+    
     /**
      * Get all posts associated with this category.
      *
@@ -33,6 +34,6 @@ class Category extends Model
      */
     public function posts()
     {
-        return $this->belongsToMany(Post::class, 'category_post', 'category_id', 'post_id');
+        return $this->belongsToMany(Post::class, 'post_categories');
     }
 }

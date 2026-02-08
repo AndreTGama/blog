@@ -16,7 +16,7 @@ return new class extends Migration
             $table->string('cover_image');
             $table->string('title', 255);
             $table->string('slug', 100)->unique();
-            $table->string('excerpt', 100);
+            $table->text('excerpt', 100);
             $table->longText('content');
             $table->enum('status', ['draft', 'published', 'archived'])->default('draft');
             $table->integer('views')->default(0);

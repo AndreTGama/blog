@@ -61,4 +61,14 @@ class Post extends Model
     {
         return $this->hasMany(PostMeta::class);
     }
+
+    /**
+     * Get the categories associated with the post.
+     *
+     * @return \Illuminate\Database\Eloquent\Relations\BelongsToMany
+     */
+    public function categories()
+    {
+        return $this->belongsToMany(Category::class, 'post_categories', 'post_id', 'category_id');
+    }
 }

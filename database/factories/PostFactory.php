@@ -29,8 +29,7 @@ class PostFactory extends Factory
             'status' => $this->faker->randomElement(['draft', 'published']),
             'views' => $this->faker->numberBetween(0, 1000),
             'published_at' => $this->faker->dateTimeBetween('-1 year', 'now'),
-            'author_id' => User::factory(),
-
+            'author_id' => User::factory()
         ];
     }
 }

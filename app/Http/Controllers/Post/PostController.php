@@ -12,6 +12,11 @@ use App\Services\Post\PostService;
 class PostController extends Controller
 {
 
+    /**
+     * PostController constructor.
+     *
+     * @param PostService $postService The service responsible for handling post-related business logic.
+     */
     public function __construct(private PostService $postService) {}
 
 

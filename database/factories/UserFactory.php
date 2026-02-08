@@ -24,13 +24,15 @@ class UserFactory extends Factory
      */
     public function definition(): array
     {
+        $role = \App\Models\Role::where('name', 'admin')->first();
+
         return [
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
             'password' => 'Senha@123',
             'remember_token' => Str::random(10),
-            'role_id' => RoleFactory::new(),
+            'role_id' => $role ? $role->id : Role::factory(), // Assign existing admin role or create one if it doesn't exist
         ];
     }
 

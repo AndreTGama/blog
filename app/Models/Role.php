@@ -10,9 +10,23 @@ class Role extends Model
 {
     use HasFactory, HasUuids;
 
-
+    /**
+     * The table associated with the model.
+     *
+     * @var string
+     */
+    protected $table = 'roles';
+    
+    /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
     protected $fillable = ['name'];
 
+    /**
+     * Get the users that have the role.
+     */
     public function users()
     {
         return $this->hasMany(User::class);

@@ -28,7 +28,7 @@ class PostService
         }
 
         $query->orderBy($dto->orderBy, $dto->orderDirection);
-
+        $query->with(['author', 'categories']);
         return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
     }
 }
