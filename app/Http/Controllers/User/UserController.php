@@ -180,4 +180,39 @@ class UserController extends Controller
             );
         }
     }
+
+
+    /**
+     * Restore a soft-deleted user.
+     *
+     * @param User $user The user instance to be restored.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating success or failure.
+     *         - On success (200): Returns the restored user data.
+     *         - On failure (500): Returns an error message with exception details.
+     *
+     * @throws \Illuminate\Auth\Access\AuthorizationException If the user is not authorized to restore.
+     *
+     * @example
+     *     POST /api/users/{id}/restore
+     *     Response: { "message": "User restored successfully.", "data": {...}, "status": 200 }
+     */
+    public function restore(User $user)
+    {
+        try {
+            $this->authorize('restore', $user);
+            $data = $this->userService->restore($user);
+            return ApiResponse::success(
+                message: 'User restored successfully.',
+                data: $data,
+                status: 200
+            );
+        } catch (\Exception $e) {
+            return ApiResponse::error(
+                message: 'Failed to restore user.',
+                exception: $e,
+                data: null,
+                status: 500
+            );
+        }
+    }
 }

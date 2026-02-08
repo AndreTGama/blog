@@ -96,4 +96,16 @@ class UserService
         $user->update($data->toArray());
         return $user;
     }
+
+    /**
+     * Restore a soft-deleted user.
+     *
+     * @param User $user The user instance to restore
+     * @return User The restored user instance
+     */
+    public function restore(User $user): User
+    {
+        $user->restore();
+        return $user;
+    }
 }
