@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers\Post;
 
+use App\DataTransferObjects\Post\Request\StorePostDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\IndexPostRequest;
+use App\Http\Requests\Post\StorePostRequest;
 use App\Http\Resources\Common\PaginatedResource;
 use App\Http\Resources\Post\PostResource;
+use App\Models\Post;
 use App\Responses\ApiResponse;
 use App\Services\Post\PostService;
 
@@ -33,6 +36,17 @@ class PostController extends Controller
             message: 'Posts retrieved successfully.',
             data: new PaginatedResource($data, PostResource::class),
             status: 200
+        );
+    }
+
+    public function store(StorePostRequest $request)
+    {
+        $this->authorize('create', Post::class);
+        $data = $this->postService->store(dto: StorePostDTO::fromArray($request->validated()));
+        return ApiResponse::success(
+            message: 'Post created successfully.',
+            data: new PostResource($data),
+            status: 201
         );
     }
 }

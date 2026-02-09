@@ -3,12 +3,21 @@
 namespace App\Services\Post;
 
 use App\DataTransferObjects\Common\IndexDTO;
+use App\DataTransferObjects\Post\Request\StorePostDTO;
 use App\Models\Post;
+use App\Supports\SlugGenerator;
 use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PostService
 {
+    public function __construct(private SlugGenerator $slugGenerator) {}
 
+    /**
+     * Retrieve a paginated list of posts based on the provided filters and pagination parameters.
+     *
+     * @param IndexDTO $dto The data transfer object containing filters and pagination parameters.
+     * @return LengthAwarePaginator A paginated collection of posts matching the criteria.
+     */
     public function index(IndexDTO $dto): LengthAwarePaginator
     {
         $query = Post::query();
@@ -30,5 +39,34 @@ class PostService
         $query->orderBy($dto->orderBy, $dto->orderDirection);
         $query->with(['author', 'categories']);
         return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
+    }
+
+    public function store(StorePostDTO $dto): Post
+    {
+        $post = new Post();
+        $post->cover_image = $dto->coverImage;
+        $post->title = $dto->title;
+        $post->slug = $this->slugGenerator->generateUnique($dto->title, 'posts');
+        $post->excerpt = $dto->excerpt;
+        $post->content = $dto->content;
+        $post->status = $dto->status;
+        $post->author_id = auth()->id();
+
+        $post->save(); 
+
+        if ($dto->postMeta) {
+            foreach ($dto->postMeta as $meta) {
+                $post->postMeta()->create([
+                    'key' => $meta->key,
+                    'value' => $meta->value,
+                ]);
+            }
+        }
+
+        if (!empty($dto->categoryIds)) {
+            $post->categories()->sync($dto->categoryIds);
+        }
+
+        return $post;
     }
 }
