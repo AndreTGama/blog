@@ -41,6 +41,12 @@ class PostService
         return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
     }
 
+    /**
+     * Store a new post in the database based on the provided data transfer object.
+     *
+     * @param StorePostDTO $dto The data transfer object containing the details of the post to be created.
+     * @return Post The newly created post instance.
+     */
     public function store(StorePostDTO $dto): Post
     {
         $post = new Post();

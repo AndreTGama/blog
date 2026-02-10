@@ -39,6 +39,12 @@ class PostController extends Controller
         );
     }
 
+    /**
+     * Store a newly created post in the database.
+     *
+     * @param StorePostRequest $request The request object containing the details of the post to be created.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation and containing the created post data.
+     */
     public function store(StorePostRequest $request)
     {
         $this->authorize('create', Post::class);
