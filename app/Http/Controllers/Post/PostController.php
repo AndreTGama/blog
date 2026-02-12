@@ -55,4 +55,20 @@ class PostController extends Controller
             status: 201
         );
     }
+
+    /**
+     * Display the specified post.
+     *
+     * @param Post $postResource The post model instance to be displayed.
+     * @return \Illuminate\Http\JsonResponse A JSON response containing the details of the specified post.
+     */
+    public function show(Post $postResource)
+    {
+        $data = $this->postService->show(post: $postResource);
+        return ApiResponse::success(
+            message: 'Post retrieved successfully.',
+            data: new PostResource($data),
+            status: 200
+        );
+    }
 }

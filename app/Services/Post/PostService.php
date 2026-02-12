@@ -10,7 +10,11 @@ use Illuminate\Contracts\Pagination\LengthAwarePaginator;
 
 class PostService
 {
-    public function __construct(private SlugGenerator $slugGenerator) {}
+    private array $loads = ['author', 'categories', 'postMetas'];
+
+    public function __construct(
+        private SlugGenerator $slugGenerator
+    ) {}
 
     /**
      * Retrieve a paginated list of posts based on the provided filters and pagination parameters.
@@ -37,7 +41,7 @@ class PostService
         }
 
         $query->orderBy($dto->orderBy, $dto->orderDirection);
-        $query->with(['author', 'categories', 'postMetas']);
+        $query->with($this->loads);
         return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
     }
 
@@ -58,7 +62,7 @@ class PostService
         $post->status = $dto->status;
         $post->author_id = auth()->id();
 
-        $post->save(); 
+        $post->save();
 
         if ($dto->postMetas) {
             foreach ($dto->postMetas as $meta) {
@@ -74,5 +78,16 @@ class PostService
         }
 
         return $post;
+    }
+
+    /**
+     * Retrieve the details of a specific post.
+     *
+     * @param Post $post The post model instance to be retrieved.
+     * @return Post The post instance with its related data loaded.
+     */
+    public function show(Post $post): Post
+    {
+        return $post->load($this->loads);
     }
 }
