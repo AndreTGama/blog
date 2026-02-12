@@ -107,4 +107,21 @@ class PostController extends Controller
             status: 200
         );
     }
+
+    /**
+     * Restore a soft-deleted post.
+     *
+     * @param Post $postResource The post model instance to be restored.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function restore(Post $postResource)
+    {
+        $this->authorize('restore', $postResource);
+        $this->postService->restore(post: $postResource);
+        return ApiResponse::success(
+            message: 'Post restored successfully.',
+            data: null,
+            status: 200
+        );
+    }
 }

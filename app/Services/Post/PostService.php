@@ -142,4 +142,15 @@ class PostService
     {
         $post->delete();
     }
+
+    /**
+     * Restore a soft-deleted post.
+     *
+     * @param Post $post The post model instance to be restored.
+     * @return void
+     */
+    public function restore(Post $post): void
+    {
+        $post->restore();
+    }
 }
