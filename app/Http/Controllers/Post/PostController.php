@@ -6,6 +6,7 @@ use App\DataTransferObjects\Post\Request\StorePostDTO;
 use App\Http\Controllers\Controller;
 use App\Http\Requests\Post\IndexPostRequest;
 use App\Http\Requests\Post\StorePostRequest;
+use App\Http\Requests\Post\UpdatePostRequest;
 use App\Http\Resources\Common\PaginatedResource;
 use App\Http\Resources\Post\PostResource;
 use App\Models\Post;
@@ -67,6 +68,24 @@ class PostController extends Controller
         $data = $this->postService->show(post: $postResource);
         return ApiResponse::success(
             message: 'Post retrieved successfully.',
+            data: new PostResource($data),
+            status: 200
+        );
+    }
+
+    /**
+     * Update the specified post in the database.
+     *
+     * @param UpdatePostRequest $request The request object containing the updated details of the post.
+     * @param Post $postResource The post model instance to be updated.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation and containing the updated post data.
+     */
+    public function update(UpdatePostRequest $request, Post $postResource)
+    {
+        $this->authorize('update', $postResource);
+        $data = $this->postService->update(post: $postResource, dto: StorePostDTO::fromArray($request->validated()));
+        return ApiResponse::success(
+            message: 'Post updated successfully.',
             data: new PostResource($data),
             status: 200
         );

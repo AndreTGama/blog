@@ -90,4 +90,45 @@ class PostService
     {
         return $post->load($this->loads);
     }
+
+    /**
+     * Update an existing post in the database based on the provided data transfer object.
+     *
+     * @param Post $post The post model instance to be updated.
+     * @param StorePostDTO $dto The data transfer object containing the updated details of the post.
+     * @return Post The updated post instance.
+     */
+    public function update(Post $post, StorePostDTO $dto): Post
+    {
+        $post->cover_image = $dto->coverImage ?? $post->cover_image;
+        $post->title = $dto->title ?? $post->title;
+        if ($dto->title && $dto->title !== $post->title) {
+            $post->slug = $this->slugGenerator->generateUnique($dto->title, 'posts');
+        }
+        $post->excerpt = $dto->excerpt ?? $post->excerpt;
+        $post->content = $dto->content ?? $post->content;
+        $post->status = $dto->status ?? $post->status;
+
+        $post->save();
+
+        if ($dto->postMetas) {
+            foreach ($dto->postMetas as $meta) {
+                $existingMeta = $post->postMetas()->where('key', $meta->key)->first();
+                if ($existingMeta) {
+                    $existingMeta->update(['value' => $meta->value]);
+                } else {
+                    $post->postMetas()->create([
+                        'key' => $meta->key,
+                        'value' => $meta->value,
+                    ]);
+                }
+            }
+        }
+
+        if (isset($dto->categoryIds)) {
+            $post->categories()->sync($dto->categoryIds);
+        }
+
+        return $post;
+    }
 }
