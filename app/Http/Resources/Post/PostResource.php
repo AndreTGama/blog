@@ -3,6 +3,7 @@
 namespace App\Http\Resources\Post;
 
 use App\Http\Resources\Category\CategoryResource;
+use App\Http\Resources\PostMeta\PostMetaResource;
 use App\Http\Resources\User\UserResource;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
@@ -28,6 +29,7 @@ class PostResource extends JsonResource
             'published_at' => $this->published_at,
             'author'       => new UserResource($this->whenLoaded('author')),
             'categories'   => CategoryResource::collection($this->whenLoaded('categories')),
+            'post_metas'   => PostMetaResource::collection($this->whenLoaded('postMetas')),
             'created_at'   => $this->created_at,
             'updated_at'   => $this->updated_at,
         ];

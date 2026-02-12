@@ -37,7 +37,7 @@ class PostService
         }
 
         $query->orderBy($dto->orderBy, $dto->orderDirection);
-        $query->with(['author', 'categories']);
+        $query->with(['author', 'categories', 'postMetas']);
         return $query->paginate($dto->limit, ['*'], 'page', $dto->page);
     }
 
@@ -60,9 +60,9 @@ class PostService
 
         $post->save(); 
 
-        if ($dto->postMeta) {
-            foreach ($dto->postMeta as $meta) {
-                $post->postMeta()->create([
+        if ($dto->postMetas) {
+            foreach ($dto->postMetas as $meta) {
+                $post->postMetas()->create([
                     'key' => $meta->key,
                     'value' => $meta->value,
                 ]);

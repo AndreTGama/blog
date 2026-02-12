@@ -57,7 +57,7 @@ class Post extends Model
      *
      * @return \Illuminate\Database\Eloquent\Relations\HasMany
      */
-    public function postMeta()
+    public function postMetas()
     {
         return $this->hasMany(PostMeta::class);
     }

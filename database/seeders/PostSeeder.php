@@ -14,6 +14,9 @@ class PostSeeder extends Seeder
         \App\Models\Post::factory()->count(10)->afterCreating(function ($post) {
             $categories = \App\Models\Category::inRandomOrder()->take(rand(1, 3))->pluck('id');
             $post->categories()->attach($categories);
+            \App\Models\PostMeta::factory()->count(rand(1, 5))->create([
+                'post_id' => $post->id,
+            ]);
         })->create();
     }
 }

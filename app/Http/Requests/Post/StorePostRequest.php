@@ -28,9 +28,9 @@ class StorePostRequest extends FormRequest
             'content' => ['required', 'string'],
             'status' => ['required', 'in:draft,published,archived'],
 
-            'post_meta' => ['nullable', 'array'],
-            'post_meta.*.key' => ['required_with:post_meta', 'string', 'max:255'],
-            'post_meta.*.value' => ['required_with:post_meta', 'string'],
+            'post_metas' => ['nullable', 'array'],
+            'post_metas.*.key' => ['required_with:post_metas', 'string', 'max:255'],
+            'post_metas.*.value' => ['required_with:post_metas', 'string'],
 
             'category_ids' => ['required', 'array'],
             'category_ids.*' => ['string', 'exists:categories,id'],

@@ -24,7 +24,7 @@ class StorePostDTO
         public string            $excerpt,
         public string            $content,
         public string            $status,
-        public ?array            $postMeta,
+        public ?array            $postMetas,
         public array             $categoryIds
     ) {}
 
@@ -42,7 +42,7 @@ class StorePostDTO
             excerpt: $data['excerpt'],
             content: $data['content'],
             status: $data['status'],
-            postMeta: array_key_exists('post_meta', $data) ? array_map(fn($meta) => IndexPostMetaDTO::fromArray($meta), $data['post_meta']) : null,
+            postMetas: array_key_exists('post_meta', $data) ? array_map(fn($meta) => IndexPostMetaDTO::fromArray($meta), $data['post_metas']) : null,
             categoryIds: $data['category_ids'] ?? []
         );
     }
@@ -57,7 +57,7 @@ class StorePostDTO
      *     excerpt: string,
      *     content: string,
      *     status: string,
-     *     post_meta: array|null,
+     *     post_metas: array|null,
      *     category_ids: array
      * }
      * Returns an array containing the post's title, slug, excerpt, content, and associated category IDs.
@@ -70,7 +70,7 @@ class StorePostDTO
             'excerpt' => $this->excerpt,
             'content' => $this->content,
             'status' => $this->status,
-            'post_meta' => $this->postMeta ? array_map(fn($meta) => $meta->toArray(), $this->postMeta) : null,
+            'post_metas' => $this->postMetas ? array_map(fn($meta) => $meta->toArray(), $this->postMetas) : null,
             'category_ids' => $this->categoryIds
         ];
     }
