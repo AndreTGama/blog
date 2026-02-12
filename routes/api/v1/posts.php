@@ -14,6 +14,6 @@ Route::middleware('auth:sanctum')->prefix('posts')->group(function () {
     Route::post('/', [PostController::class, 'store'])->name('posts.store');
     Route::get('/{postResource}', [PostController::class, 'show'])->name('posts.show')->withoutMiddleware('auth:sanctum');
     Route::put('/{postResource}', [PostController::class, 'update'])->name('posts.update');
-    Route::delete('/{postResource}', [PostController::class, 'destroy'])->name('posts.destroy');
+    Route::delete('/{postResource}', [PostController::class, 'delete'])->name('posts.delete');
     Route::put('/{postResource}/restore', [PostController::class, 'restore'])->name('posts.restore');
 });

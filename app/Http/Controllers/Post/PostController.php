@@ -90,4 +90,21 @@ class PostController extends Controller
             status: 200
         );
     }
+
+    /**
+     * Remove the specified post from the database.
+     *
+     * @param Post $postResource The post model instance to be deleted.
+     * @return \Illuminate\Http\JsonResponse A JSON response indicating the success of the operation.
+     */
+    public function delete(Post $postResource)
+    {
+        $this->authorize('delete', $postResource);
+        $this->postService->delete(post: $postResource);
+        return ApiResponse::success(
+            message: 'Post deleted successfully.',
+            data: null,
+            status: 200
+        );
+    }
 }

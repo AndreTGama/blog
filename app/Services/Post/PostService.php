@@ -131,4 +131,15 @@ class PostService
 
         return $post;
     }
+
+    /**
+     * Delete a post from the database.
+     *
+     * @param Post $post The post model instance to be deleted.
+     * @return void
+     */
+    public function delete(Post $post): void
+    {
+        $post->delete();
+    }
 }
